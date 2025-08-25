@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import { now } from "./utils/time";
 import { ITelegramUpdate } from "./specs/telegram";
 import handleInteractTelegram from "./interact/telegram";
+import { connectDB } from "./db/common";
 dotenv.config();
 
 const app = express();
@@ -21,3 +22,5 @@ app.post("/interact/telegram", handleInteractTelegram);
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });
+
+connectDB();
