@@ -22,5 +22,54 @@
       "additionalProperties": false,
       "properties": {}
     }
+  },
+  {
+    "name": "setJob",
+    "description": "sets a task to search all tasks in clickup and find the report the ones with described details to user",
+    "parameters": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["instant", "interval"],
+          "description": "define it's a one time instant job or it's a interval"
+        },
+        "title": {
+          "type": "string",
+          "description": "title of the job"
+        },
+        "description": {
+          "type": "string",
+          "description": "description of the job"
+        },
+        "definition": {
+          "type": "properties",
+          "properties": {
+            "type": {
+              "type": "string",
+              "description": "the type of definition for this job",
+              "enum": ["clickup:tasks:report"]
+            },
+            "description": {
+              "type": "string",
+              "description": "full description about the job and how it should be done for each task"
+            },
+            "workspace": {
+              "type": "string",
+              "description": "workspace name to look into, use 'all' if not provided"
+            },
+            "folder": {
+              "type": "string",
+              "description": "folder name to look into, use 'all' if not provided"
+            },
+            "list": {
+              "type": "string",
+              "description": "list name to look into, use 'all' if not provided"
+            }
+          }
+        }
+      }
+    }
   }
 ]

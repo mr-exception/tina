@@ -3,8 +3,11 @@ import { ICallResponse } from "../../db/message";
 import { UserDoc } from "../../db/user";
 import { ModelCallResponse } from "../../specs/interaction";
 
+type Parameters = {
+  service: string;
+};
 export async function handleAuthenticate(user: UserDoc, call: ModelCallResponse): Promise<ICallResponse> {
-  const service = call.parameters.service;
+  const service = (call.parameters as Parameters).service;
   switch (service) {
     case "clickup":
       return handleClickup(user, call);

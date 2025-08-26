@@ -8,7 +8,7 @@ export type ModelCallResponse = {
   type: "call";
   id: string;
   name: string;
-  parameters: { [key: string]: string };
+  parameters: unknown;
   usage: number;
 };
 

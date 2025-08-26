@@ -33,8 +33,11 @@ export const tocUpdateTool: IToolDefinition = {
   strict: true,
 };
 
+type Paramaters = {
+  status: "accepted" | "rejected";
+};
 export async function handleToC(user: UserDoc, call: ModelCallResponse): Promise<ICallResponse> {
-  const status = call.parameters.status;
+  const status = (call.parameters as Paramaters).status;
   switch (status) {
     case "accepted":
       user.toc.status = "accepted";
@@ -45,6 +48,7 @@ export async function handleToC(user: UserDoc, call: ModelCallResponse): Promise
         name: call.name,
         result: "user toc status updated to accepted",
       };
+    case "rejected":
     default:
       user.toc.status = "rejected";
       user.toc.updatedAt = now();
