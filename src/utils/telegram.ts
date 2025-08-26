@@ -8,5 +8,8 @@ interface ISendMessageParams {
   text: string;
 }
 export async function sendMessage(params: ISendMessageParams) {
-  return axios.post(`https://api.telegram.org/bot${tgToken()}/sendMessage`, params);
+  return axios.post(`https://api.telegram.org/bot${tgToken()}/sendMessage`, {
+    ...params,
+    parse_mode: "Markdown",
+  });
 }

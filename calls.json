@@ -13,5 +13,14 @@
         }
       }
     }
+  },
+  {
+    "name": "getBalance",
+    "description": "get user balance, usage and credit info",
+    "parameters": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {}
+    }
   }
 ]

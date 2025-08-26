@@ -1,9 +1,14 @@
 import express, { Request, Response } from "express";
 import dotenv from "dotenv";
 import { now } from "./utils/time";
-import { ITelegramUpdate } from "./specs/telegram";
 import handleInteractTelegram from "./interact/telegram";
 import { connectDB } from "./db/common";
+import { loadCalls } from "./handle/calls";
+import { log } from "./utils/logger";
+
+// redirects
+import redirectClickUp from "./redirects/clickup";
+
 dotenv.config();
 
 const app = express();
@@ -19,8 +24,11 @@ app.get("/", (req: Request, res: Response) => {
 
 app.post("/interact/telegram", handleInteractTelegram);
 
+app.get("/redirect/clickup", redirectClickUp);
+
 app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+  log(`Server running on http://localhost:${PORT}`);
 });
 
 connectDB();
+loadCalls();

@@ -2,10 +2,10 @@ import { Request, Response } from "express";
 import { ITelegramUpdate } from "../specs/telegram";
 import { sendMessage } from "../utils/telegram";
 import { IUser, UserModel } from "../db/user";
-import { openaiChatCompletion } from "../utils/openai";
-import { getLastTopicMessages, MessageModel } from "../db/message";
-import { Types } from "mongoose";
+import { MessageModel } from "../db/message";
 import { now } from "../utils/time";
+import { handleCyclingFlow } from "../handle/handle";
+import { log } from "../utils/logger";
 
 export default async function handleInteractTelegram(req: Request, res: Response) {
   const payload = req.body as ITelegramUpdate;
@@ -13,44 +13,15 @@ export default async function handleInteractTelegram(req: Request, res: Response
     const user = await registerUser(payload);
 
     await createUserMessage(payload, user);
-    console.log("created message");
-    const messages = await getLastTopicMessages({
-      connectionSource: "telegram-chat",
-      connectionRefId: payload.message.chat.id,
-    });
-    const response = await openaiChatCompletion(
-      messages.map((item) => {
-        if (item.user._id === new Types.ObjectId("000000000000000000000000")) {
-          return {
-            role: "assistant",
-            content: item.body,
-          };
-        } else {
-          return {
-            role: "user",
-            content: item.body,
-          };
-        }
-      })
-    );
-    sendMessage({
-      chat_id: payload.message.chat.id,
-      text: response.content || "",
-    });
-    await MessageModel.create({
-      body: response.content || "",
-      type: "text",
-      connection: { source: "telegram-chat", refId: payload.message.chat.id },
-      user: {
-        _id: new Types.ObjectId("000000000000000000000000"),
-        name: "tina",
-      },
-      createdAt: now(),
-      updatedAt: now(),
+    log(user.username + ":", payload.message.text);
+
+    await handleCyclingFlow({
+      user,
+      sourceConnection: { source: "telegram-chat", refId: payload.message.chat.id },
     });
     return res.send({ message: "ok" });
   } catch (err) {
-    console.log(err);
+    log((err as Error).message);
     sendMessage({
       chat_id: payload.message.chat.id,
       text: "something went wrong. Please try again later.",
@@ -69,6 +40,10 @@ async function registerUser(payload: ITelegramUpdate) {
         { source: "telegram-chat", refId: payload.message.chat.id },
         { source: "telegram-user", refId: payload.message.from.id },
       ],
+      toc: {
+        status: "rejected",
+        updatedAt: now(),
+      },
       usage: {
         usage: 0,
         credit: 0,

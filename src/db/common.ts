@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { log } from "../utils/logger";
 
 export interface IDBRecord {
   _id: mongoose.Types.ObjectId;
@@ -27,5 +28,5 @@ export const ConnectionSchema = new mongoose.Schema<IConnection>({
 
 export async function connectDB() {
   await mongoose.connect(process.env.MONGO_URI || "", { authMechanism: "DEFAULT" });
-  console.log("connected to db");
+  log("connected to db");
 }

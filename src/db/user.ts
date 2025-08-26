@@ -7,6 +7,7 @@ export interface IUser extends IDBRecord {
   password: string;
   connections: IConnection[];
   usage: IUserUsage;
+  toc: IUserToC;
 }
 
 export interface IUserUsage {
@@ -16,6 +17,11 @@ export interface IUserUsage {
   usageHardLimit: number;
 }
 
+export interface IUserToC {
+  status: "accepted" | "rejected";
+  updatedAt: number;
+}
+
 const UserUsageSchema = new Schema<IUserUsage>({
   credit: { type: Number, default: 0 },
   usage: { type: Number, default: 0 },
@@ -23,13 +29,20 @@ const UserUsageSchema = new Schema<IUserUsage>({
   usageHardLimit: { type: Number, default: 0 },
 });
 
+const UserToCSchema = new Schema<IUserToC>({
+  status: { type: String, enum: ["accepted", "rejected"], required: true },
+  updatedAt: { type: Number, required: true, default: now() },
+});
+
 const UserSchema = new Schema<IUser>({
   username: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   connections: { type: [ConnectionSchema], default: [] },
   usage: { type: UserUsageSchema, required: true },
+  toc: { type: UserToCSchema, required: true },
   createdAt: { type: Number, required: true, default: now() },
   updatedAt: { type: Number, required: true, default: now() },
 });
 
 export const UserModel = model("user", UserSchema, "users");
+export type UserDoc = IUser & Document;
