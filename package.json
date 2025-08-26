@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "nodemon --watch src --exec ts-node src/index.ts",
+    "embedd": "ts-node src/embedd-calls.ts",
     "build": "tsc",
     "start": "node dist/index.js"
   },

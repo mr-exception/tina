@@ -1,0 +1,17 @@
+[
+  {
+    "name": "authenticate",
+    "description": "authenticate to user account in clickup",
+    "parameters": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "service": {
+          "type": "string",
+          "description": "clickup service name",
+          "enum": ["clickup"]
+        }
+      }
+    }
+  }
+]
