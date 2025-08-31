@@ -4,6 +4,7 @@ export interface ICallDefinition {
   parameters: {
     type: "object";
     additionalProperties: boolean;
+    required: string[];
     properties: {
       [key: string]: {
         type: string;

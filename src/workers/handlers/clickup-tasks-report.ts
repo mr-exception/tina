@@ -1,9 +1,13 @@
+import axios from "axios";
 import { JobDoc } from "../../db/job";
 import { ICallResponse } from "../../db/message";
-import { submitUserUsage, UserModel } from "../../db/user";
+import { submitUserUsage, UserDoc, UserModel } from "../../db/user";
 import { ModelCallResponse } from "../../specs/interaction";
 import { IOpenAIMessage, IToolDefinition, openaiChatCompletion } from "../../utils/openai";
 import { sendMessage } from "../../utils/telegram";
+import { IntergationModel } from "../../db/integration";
+import mongoose, { mongo } from "mongoose";
+import { getClickupTasks } from "../../integrations/clickup";
 
 const systemContext = `
 users provides you a task you have to perform on clickup and report back the result they want.
@@ -111,7 +115,7 @@ export default async function handler(job: JobDoc) {
         ],
       });
       try {
-        const result = await handleTools(response);
+        const result = await handleTools(job.user._id, response);
         messages.push({
           role: "tool",
           tool_call_id: result.id,
@@ -138,7 +142,14 @@ async function sendResults(job: JobDoc, results: string) {
   sendMessage({ chat_id: connection.refId, text: results });
 }
 
-async function handleTools(call: ModelCallResponse): Promise<ICallResponse> {
+async function handleTools(userId: mongoose.Types.ObjectId, call: ModelCallResponse): Promise<ICallResponse> {
+  const accessToken = await getClickupToken(userId);
+  if (!accessToken)
+    return {
+      id: call.id,
+      name: call.name,
+      result: "I don't have access to your clickup account",
+    };
   switch (call.name) {
     case "getWorkspaces":
       return {
@@ -158,16 +169,32 @@ async function handleTools(call: ModelCallResponse): Promise<ICallResponse> {
         name: call.name,
         result: JSON.stringify([{ name: "features", id: "l1" }]),
       };
-    case "getTasks":
+    case "getTasks": {
+      const { listId } = call.parameters as { listId: string };
+      const tasks = await getClickupTasks(listId, accessToken).then((data) =>
+        data.map((task) => {
+          return {
+            url: task.url,
+            tags: task.tags.map((tag) => tag.name),
+            name: task.name,
+            description: task.description,
+            list: task.list.name,
+          };
+        })
+      );
       return {
         id: call.id,
         name: call.name,
-        result: JSON.stringify([
-          { name: "task 1", id: "t1", tags: [] },
-          { name: "task 2", id: "t2", tags: ["bug"] },
-        ]),
+        result: JSON.stringify(tasks),
       };
+    }
     default:
       throw new Error(`Unknown tool ${call.name}`);
   }
+}
+
+async function getClickupToken(userId: mongoose.Types.ObjectId) {
+  const integration = await IntergationModel.findOne({ "user._id": userId, service: "clickup" });
+  if (!integration) return;
+  return integration.accessToken;
 }

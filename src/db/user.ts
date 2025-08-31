@@ -48,6 +48,5 @@ export const UserModel = model("user", UserSchema, "users");
 export type UserDoc = IUser & Document;
 
 export async function submitUserUsage(id: Types.ObjectId, amount: number) {
-  const user = await UserModel.findById(id);
-  return UserModel.findOneAndUpdate({ _id: id }, { $inc: { usage: amount } });
+  return UserModel.findOneAndUpdate({ _id: id }, { $inc: { "usage.usage": amount } });
 }
