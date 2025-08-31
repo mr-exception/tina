@@ -1,6 +1,6 @@
 import mongoose, { now, Types } from "mongoose";
 import { getLastTopicMessages, ICallResponse, IMessage, MessageModel } from "../db/message";
-import { UserDoc } from "../db/user";
+import { submitUserUsage, UserDoc } from "../db/user";
 import {
   embeddData,
   IOpenAIMessage,
@@ -38,8 +38,8 @@ export async function handleCompletion(user: UserDoc, messageRecords: IMessage[]
         name: call.name,
         description: call.description,
         parameters: call.parameters,
+        strict: true,
       },
-      strict: true,
     });
   });
   try {
@@ -67,7 +67,7 @@ export async function handleCyclingFlow({ user, sourceConnection }: IHandleCycli
     const response = await handleCompletion(user, messages);
     if (!response) throw new Error("no response");
 
-    user.usage.usage += response.usage;
+    await submitUserUsage(user._id, response.usage);
 
     if (response.type === "content") {
       sendMessage({

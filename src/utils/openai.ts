@@ -35,9 +35,10 @@ export interface IToolDefinition {
       type: "object";
       properties: any;
       additionalProperties: boolean;
+      required?: string[];
     };
+    strict: boolean;
   };
-  strict: boolean;
 }
 
 export interface IOpenAIParams {

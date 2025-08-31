@@ -30,10 +30,14 @@
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "type": {
+        "runType": {
           "type": "string",
           "enum": ["instant", "interval"],
           "description": "define it's a one time instant job or it's a interval"
+        },
+        "schedule": {
+          "type": "string",
+          "description": "schedule for the job in cronjob format. only of runType is interval"
         },
         "title": {
           "type": "string",
@@ -43,31 +47,14 @@
           "type": "string",
           "description": "description of the job"
         },
+        "handler": {
+          "type": "string",
+          "description": "the type of definition for this job",
+          "enum": ["clickup:tasks:report"]
+        },
         "definition": {
-          "type": "properties",
-          "properties": {
-            "type": {
-              "type": "string",
-              "description": "the type of definition for this job",
-              "enum": ["clickup:tasks:report"]
-            },
-            "description": {
-              "type": "string",
-              "description": "full description about the job and how it should be done for each task"
-            },
-            "workspace": {
-              "type": "string",
-              "description": "workspace name to look into, use 'all' if not provided"
-            },
-            "folder": {
-              "type": "string",
-              "description": "folder name to look into, use 'all' if not provided"
-            },
-            "list": {
-              "type": "string",
-              "description": "list name to look into, use 'all' if not provided"
-            }
-          }
+          "type": "string",
+          "description": "definition of task with all details user mentioned."
         }
       }
     }

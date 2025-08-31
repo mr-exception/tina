@@ -1,16 +1,16 @@
-import { IJob, JobModel } from "../../db/job";
+import { JobModel } from "../../db/job";
 import { ICallResponse } from "../../db/message";
 import { UserDoc } from "../../db/user";
 import { ModelCallResponse } from "../../specs/interaction";
-import { JobDefinition } from "../../specs/jobs";
-import { log } from "../../utils/logger";
 import { now } from "../../utils/time";
 
 type Parameters = {
-  type: "instant" | "interval";
+  runType: "instant" | "interval";
+  schedule?: string;
   title: string;
   description: string;
-  definition: JobDefinition;
+  handler: string;
+  definition: string;
 };
 export async function handleSetJob(user: UserDoc, call: ModelCallResponse): Promise<ICallResponse> {
   const parameters = call.parameters as Parameters;
@@ -19,11 +19,10 @@ export async function handleSetJob(user: UserDoc, call: ModelCallResponse): Prom
     updatedAt: now(),
     title: parameters.title,
     description: parameters.description,
-    handler: parameters.definition.type,
-    type: parameters.type,
-    status: "idle",
-    definition: JSON.stringify(parameters.definition),
-    timing: parameters.type === "instant" ? "instant" : parameters.type,
+    handler: parameters.handler,
+    runType: parameters.runType,
+    definition: parameters.definition,
+    schedule: parameters.schedule,
     user: {
       _id: user._id,
       name: user.username,

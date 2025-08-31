@@ -1,6 +1,6 @@
 import { now } from "../utils/time";
 import { ConnectionSchema, IConnection, IDBRecord } from "./common";
-import { Schema, model, Document } from "mongoose";
+import { Schema, model, Document, Mongoose, Types } from "mongoose";
 
 export interface IUser extends IDBRecord {
   username: string;
@@ -46,3 +46,8 @@ const UserSchema = new Schema<IUser>({
 
 export const UserModel = model("user", UserSchema, "users");
 export type UserDoc = IUser & Document;
+
+export async function submitUserUsage(id: Types.ObjectId, amount: number) {
+  const user = await UserModel.findById(id);
+  return UserModel.findOneAndUpdate({ _id: id }, { $inc: { usage: amount } });
+}

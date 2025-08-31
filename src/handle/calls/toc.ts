@@ -29,8 +29,8 @@ export const tocUpdateTool: IToolDefinition = {
       },
       additionalProperties: false,
     },
+    strict: true,
   },
-  strict: true,
 };
 
 type Paramaters = {

@@ -8,6 +8,7 @@ import { log } from "./utils/logger";
 
 // redirects
 import redirectClickUp from "./redirects/clickup";
+import { setupJobs } from "./workers/setup";
 
 dotenv.config();
 
@@ -32,3 +33,4 @@ app.listen(PORT, () => {
 
 connectDB();
 loadCalls();
+setupJobs();
