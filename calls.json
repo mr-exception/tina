@@ -16,6 +16,21 @@
     }
   },
   {
+    "name": "setTimezone",
+    "description": "set user timezone in IANA format based on which country or city user lives",
+    "parameters": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "timezone": {
+          "type": "string",
+          "description": "user timezone in IANA format"
+        }
+      },
+      "required": ["timezone"]
+    }
+  },
+  {
     "name": "getBalance",
     "description": "get user balance, usage and credit info",
     "parameters": {

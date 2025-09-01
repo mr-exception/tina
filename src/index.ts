@@ -31,6 +31,7 @@ app.listen(PORT, () => {
   log(`Server running on http://localhost:${PORT}`);
 });
 
-connectDB();
-loadCalls();
-setupJobs();
+connectDB().then(() => {
+  loadCalls();
+  setupJobs();
+});

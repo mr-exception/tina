@@ -8,6 +8,7 @@ export interface IUser extends IDBRecord {
   connections: IConnection[];
   usage: IUserUsage;
   toc: IUserToC;
+  timezone: string;
 }
 
 export interface IUserUsage {
@@ -40,6 +41,7 @@ const UserSchema = new Schema<IUser>({
   connections: { type: [ConnectionSchema], default: [] },
   usage: { type: UserUsageSchema, required: true },
   toc: { type: UserToCSchema, required: true },
+  timezone: { type: String, required: false },
   createdAt: { type: Number, required: true, default: now() },
   updatedAt: { type: Number, required: true, default: now() },
 });

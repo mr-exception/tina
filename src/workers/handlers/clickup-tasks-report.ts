@@ -139,7 +139,7 @@ async function sendResults(job: JobDoc, results: string) {
   if (!connection) {
     throw new Error(`User ${user._id} has no connections`);
   }
-  sendMessage({ chat_id: connection.refId, text: results });
+  await sendMessage({ chat_id: connection.refId, text: results });
 }
 
 async function handleTools(userId: mongoose.Types.ObjectId, call: ModelCallResponse): Promise<ICallResponse> {

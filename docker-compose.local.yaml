@@ -1,13 +1,6 @@
 version: "3.8"
 
 services:
-  app:
-    container_name: app
-    build:
-      dockerfile: Dockerfile
-      context: .
-    ports:
-      - 8000:8000
   mongodb:
     image: mongo:latest
     container_name: mongodb
@@ -19,5 +12,3 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: root
     volumes:
       - ./mongo-data:/data/db
-    logging:
-      driver: "none"

@@ -5,7 +5,6 @@ import { IUser, UserModel } from "../db/user";
 import { MessageModel } from "../db/message";
 import { now } from "../utils/time";
 import { handleCyclingFlow } from "../handle/handle";
-import { log } from "../utils/logger";
 
 export default async function handleInteractTelegram(req: Request, res: Response) {
   const payload = req.body as ITelegramUpdate;
@@ -13,7 +12,7 @@ export default async function handleInteractTelegram(req: Request, res: Response
     const user = await registerUser(payload);
 
     await createUserMessage(payload, user);
-    log(user.username + ":", payload.message.text);
+    console.log(user.username + ":", payload.message.text);
 
     await handleCyclingFlow({
       user,
@@ -21,8 +20,8 @@ export default async function handleInteractTelegram(req: Request, res: Response
     });
     return res.send({ message: "ok" });
   } catch (err) {
-    log((err as Error).message);
-    sendMessage({
+    console.log((err as Error).message);
+    await sendMessage({
       chat_id: payload.message.chat.id,
       text: "something went wrong. Please try again later.",
     });

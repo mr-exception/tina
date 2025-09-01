@@ -19,16 +19,27 @@ import { handleAuthenticate } from "./calls/authenticate";
 import { log } from "../utils/logger";
 import { handleGetBalance } from "./calls/getBalance";
 import { handleSetJob } from "./calls/setJob";
+import { handleSetTimezone } from "./calls/setTimezone";
+
+function generateDefaultSystemContext() {
+  return `your name is tina\ndate is ${new Date().toLocaleDateString()}\nyour outputs are telegram compatible markdown v2 format\n`;
+}
 
 export async function handleCompletion(user: UserDoc, messageRecords: IMessage[]) {
   const messages: IOpenAIMessage[] = convertMessages(messageRecords);
   const tools: IToolDefinition[] = [];
+  const defaultSystemContext = generateDefaultSystemContext();
   if (user.toc.status !== "accepted") {
     messages.unshift({
       role: "system",
-      content: ToCSystemPrompt,
+      content: defaultSystemContext + ToCSystemPrompt,
     });
     tools.push(tocUpdateTool);
+  } else {
+    messages.unshift({
+      role: "system",
+      content: defaultSystemContext,
+    });
   }
   const calls = await getSessionRelatedCalls(messages);
   calls.forEach((call) => {
@@ -70,7 +81,7 @@ export async function handleCyclingFlow({ user, sourceConnection }: IHandleCycli
     await submitUserUsage(user._id, response.usage);
 
     if (response.type === "content") {
-      sendMessage({
+      await sendMessage({
         chat_id: sourceConnection.refId,
         text: response.content,
       });
@@ -105,6 +116,9 @@ export async function handleCyclingFlow({ user, sourceConnection }: IHandleCycli
             break;
           case "getBalance":
             callResponse = await handleGetBalance(user, response);
+            break;
+          case "setTimezone":
+            callResponse = await handleSetTimezone(user, response);
             break;
           case "setJob":
             callResponse = await handleSetJob(user, response);

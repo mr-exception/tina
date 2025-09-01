@@ -10,6 +10,7 @@ export interface IJob extends IDBRecord {
   definition: string;
   runType: JobRunType;
   schedule?: string;
+  nextRun?: number;
   handler: string;
   lockedAt: number;
 }
@@ -21,6 +22,7 @@ const JobSchema = new Schema<IJob>({
   definition: { type: String, required: false },
   runType: { type: String, required: true },
   schedule: { type: String, required: false },
+  nextRun: { type: Number, required: false },
   handler: { type: String, required: true },
   lockedAt: { type: Number, required: false },
   createdAt: { type: Number, required: true, default: now() },

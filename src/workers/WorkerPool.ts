@@ -1,4 +1,4 @@
-import { JobDoc, JobModel } from "../db/job";
+import { JobModel } from "../db/job";
 import { now } from "../utils/time";
 import Worker from "./Worker";
 
@@ -13,21 +13,35 @@ export default class WorkerPool {
   public async start() {
     setInterval(() => {
       this.pool.forEach(async (w) => {
-        this.feedWorker(w);
+        feedWorker(w);
       });
     }, 5000);
   }
-  private async feedWorker(worker: Worker) {
-    if (worker.stauts === "idle") {
-      const job = await JobModel.findOneAndUpdate(
-        { runType: "instant", lockedAt: null },
-        { $set: { lockedAt: now() } }
-      );
-      if (!job) {
-        return;
-      }
-      worker.job = job;
-      worker.handle();
+}
+
+async function feedWorker(worker: Worker) {
+  if (worker.stauts === "idle") {
+    const job = await JobModel.findOneAndUpdate(
+      { runType: "instant", lockedAt: null },
+      { $set: { lockedAt: now() } }
+    );
+    if (!job) {
+      return;
     }
+    worker.job = job;
+    worker.handle();
   }
+}
+
+async function findJob() {
+  const instantJob = await JobModel.findOneAndUpdate(
+    { runType: "instant", lockedAt: null },
+    { $set: { lockedAt: now() } }
+  );
+  if (!!instantJob) return instantJob;
+  const intervalJob = await JobModel.findOneAndUpdate(
+    { runType: "interval", lockedAt: null, nextRun: { $lte: now() } },
+    { $set: { lockedAt: now() } }
+  );
+  return intervalJob;
 }
