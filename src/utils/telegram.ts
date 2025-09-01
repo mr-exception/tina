@@ -4,7 +4,7 @@ function tgToken() {
 }
 
 function parseToMarkdownV2(text: string) {
-  let result = text.replace(/([.!#\(\)-])/g, "\\$1");
+  let result = text.replace(/([.!#\(\)-=\[\]{}])/g, "\\$1");
   // result = result.replace(/[#]+/g, "");
   return result;
 }
