@@ -27,6 +27,7 @@ export const tocUpdateTool: IToolDefinition = {
           enum: ["accepted", "rejected"],
         },
       },
+      required: ["status"],
       additionalProperties: false,
     },
     strict: true,
